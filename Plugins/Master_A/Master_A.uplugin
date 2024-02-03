@@ -17,8 +17,8 @@
 	"Modules": [
 		{
 			"Name": "Master_A",
-			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"Type": "Editor",
+			"LoadingPhase": "PreDefault"
 		}
 	]
 }
