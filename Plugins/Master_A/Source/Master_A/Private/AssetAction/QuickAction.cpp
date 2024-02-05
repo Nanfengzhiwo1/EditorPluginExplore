@@ -44,3 +44,47 @@ void UQuickAction::DuplicateAssets(int32 NumOfDuplicates)
 	}
 	
 }
+
+void UQuickAction::AddPrefixes()
+{
+	TArray<UObject*>SelectedObjects = UEditorUtilityLibrary::GetSelectedAssets();
+
+	// track of how many prefixes have been added
+	uint32 Counter = 0;
+
+	for (UObject* SelectedObject : SelectedObjects) 
+	{
+		if (!SelectedObject)
+		{
+			continue;
+		}
+		// use the prefix map find the key
+		FString* PrefixFound= PrefixMap.Find(SelectedObject->GetClass());
+
+		//check the pointer before using
+		if (!PrefixFound || PrefixFound->IsEmpty())
+		{
+			ShowMsgDialog(EAppMsgType::Ok, TEXT("Failed to find prefix for class")+SelectedObject->GetClass()->GetName());
+			continue;
+		}
+		FString OldName = SelectedObject->GetName();
+
+		// check if the name already starts with the prefix
+		if (OldName.StartsWith(*PrefixFound))
+		{
+			ShowMsgDialog(EAppMsgType::Ok, OldName + TEXT("already has prefix added"));
+			continue;
+		}
+
+		const FString NewNameWithPrefix = *PrefixFound + OldName;
+		
+		UEditorUtilityLibrary::RenameAsset(SelectedObject,NewNameWithPrefix);
+		++Counter;
+	}
+
+	if(Counter>0)
+	{
+		ShowNotifyInfo(TEXT("Successfully renamed " + FString::FromInt(Counter) + " assets"));
+	}
+	
+}
