@@ -14,6 +14,8 @@ class MASTER_A_API UQuickAction : public UAssetActionUtility
 {
 	GENERATED_BODY()
 	
-
+public:
+	UFUNCTION(CallInEditor)
+	void DuplicateAssets(int32 NumOfDuplicates);
 
 };
