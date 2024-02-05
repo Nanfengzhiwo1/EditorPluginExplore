@@ -11,7 +11,7 @@ void UQuickAction::DuplicateAssets(int32 NumOfDuplicates)
 	// when number is invalid ,print screen message
 	if (NumOfDuplicates<=0)
 	{
-		ScreenPrint(TEXT("Please enter a valid number!"),FColor::Red);
+		ShowMsgDialog(EAppMsgType::Ok,TEXT("Please enter a valid number"));
 		return;
 	}
 
@@ -40,7 +40,7 @@ void UQuickAction::DuplicateAssets(int32 NumOfDuplicates)
 
 	if (Counter > 0)
 	{
-		ScreenPrint(TEXT("Successfully duplicated " + FString::FromInt(Counter) + "Assets"),FColor::Green );
+		ShowNotifyInfo(TEXT("Successfully duplicated " + FString::FromInt(Counter) + "Assets"));
 	}
 	
 }
