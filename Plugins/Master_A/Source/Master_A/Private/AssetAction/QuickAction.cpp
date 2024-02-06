@@ -6,6 +6,8 @@
 #include "EditorUtilityLibrary.h"
 #include "EditorAssetLibrary.h"
 #include <Editor/UnrealEd/Public/ObjectTools.h>
+#include "AssetToolsModule.h"
+#include "AssetRegistry/AssetRegistryModule.h"
 
 void UQuickAction::DuplicateAssets(int32 NumOfDuplicates)
 {
@@ -101,6 +103,8 @@ void UQuickAction::RemoveUnusedAssets()
 	TArray<FAssetData> SelectedAssetsData= UEditorUtilityLibrary::GetSelectedAssetData();
 	TArray<FAssetData> UnusedAssetsData;
 
+	FixUpRedirectors();
+	
 	for (const FAssetData SelectedAssetData : SelectedAssetsData)
 	{
 		TArray<FString> AssetReferences=UEditorAssetLibrary::FindPackageReferencersForAsset(SelectedAssetData.ObjectPath.ToString());
@@ -124,4 +128,37 @@ void UQuickAction::RemoveUnusedAssets()
 		return;
 	}
 	ShowNotifyInfo(TEXT("Successfully deleted "+FString::FromInt(NumOfAssetsDeleted) +TEXT("unused assets.")));
+}
+
+void UQuickAction::FixUpRedirectors()
+{
+	TArray<UObjectRedirector* >RedirectorsToFixArray;
+
+	/*get redirectors*/
+	// access a  AssetRegistryModule,and store it in a local variable,only one instansce use "&",
+	FAssetRegistryModule& AssetRegistryModule= FModuleManager::Get().LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
+
+	FARFilter Filter;
+	// recursive pass to be true,it can go inside of all the subfolders
+	Filter.bRecursivePaths=true;
+	// which folder can go into
+	Filter.PackagePaths.Emplace("/Game");
+	// what's the name of the class that filter
+	Filter.ClassNames.Emplace("ObjectRedirector");
+	TArray<FAssetData> OutRedirectors;
+	
+	AssetRegistryModule.Get().GetAssets(Filter,OutRedirectors);
+
+	for (const FAssetData& OutRedirector:OutRedirectors)
+	{
+		if (UObjectRedirector* RedirectorToFix = Cast<UObjectRedirector>(OutRedirector.GetAsset()))
+		{
+			RedirectorsToFixArray.Emplace(RedirectorToFix);
+		}
+	}
+
+	/*fix redirectors*/
+	FAssetToolsModule& AssetToolsModule=FModuleManager::Get().LoadModuleChecked<FAssetToolsModule>(TEXT("AssetTools"));
+
+	AssetToolsModule.Get().FixupReferencers(RedirectorsToFixArray);
 }
