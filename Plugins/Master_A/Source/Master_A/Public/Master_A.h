@@ -12,4 +12,11 @@ public:
 	/** IModuleInterface implementation */
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
+
+
+private:
+	// In order to have better readability
+#pragma region ContentBrowserMenuExtention
+void InitContentBrowserMenuExtention();
+#pragma endregion 
 };
