@@ -17,6 +17,14 @@ public:
 private:
 	// In order to have better readability
 #pragma region ContentBrowserMenuExtention
-void InitContentBrowserMenuExtention();
+	void InitContentBrowserMenuExtention();
+	// Function: Define the position for inserting menu entry
+	TSharedRef<FExtender> CustomContentBrowserMenuExtender(const TArray<FString>& SelectedPaths);
+
+	// Function: Define all the details for menu entry
+	void AddContentBrowersMenuEntry(class FMenuBuilder& MenuBuilder);
+
+	// Function: Excute the Action
+	void OnDeleteUnusedAssetButtonClicked();
 #pragma endregion 
 };
