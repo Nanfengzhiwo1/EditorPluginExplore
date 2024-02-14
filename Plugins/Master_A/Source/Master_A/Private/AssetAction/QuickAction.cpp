@@ -14,7 +14,7 @@ void UQuickAction::DuplicateAssets(int32 NumOfDuplicates)
 	// when number is invalid ,print screen message
 	if (NumOfDuplicates<=0)
 	{
-		ShowMsgDialog(EAppMsgType::Ok,TEXT("Please enter a valid number"));
+		MessageAction::ShowMsgDialog(EAppMsgType::Ok,TEXT("Please enter a valid number"));
 		return;
 	}
 
@@ -43,7 +43,7 @@ void UQuickAction::DuplicateAssets(int32 NumOfDuplicates)
 
 	if (Counter > 0)
 	{
-		ShowNotifyInfo(TEXT("Successfully duplicated " + FString::FromInt(Counter) + "Assets"));
+		MessageAction::ShowNotifyInfo(TEXT("Successfully duplicated " + FString::FromInt(Counter) + "Assets"));
 	}
 	
 }
@@ -67,7 +67,7 @@ void UQuickAction::AddPrefixes()
 		//check the pointer before using
 		if (!PrefixFound || PrefixFound->IsEmpty())
 		{
-			ShowMsgDialog(EAppMsgType::Ok, TEXT("Failed to find prefix for class")+SelectedObject->GetClass()->GetName());
+			MessageAction::ShowMsgDialog(EAppMsgType::Ok, TEXT("Failed to find prefix for class")+SelectedObject->GetClass()->GetName());
 			continue;
 		}
 		FString OldName = SelectedObject->GetName();
@@ -75,7 +75,7 @@ void UQuickAction::AddPrefixes()
 		// check if the name already starts with the prefix
 		if (OldName.StartsWith(*PrefixFound))
 		{
-			ShowMsgDialog(EAppMsgType::Ok, OldName + TEXT("already has prefix added"));
+			MessageAction::ShowMsgDialog(EAppMsgType::Ok, OldName + TEXT("already has prefix added"));
 			continue;
 		}
 
@@ -93,7 +93,7 @@ void UQuickAction::AddPrefixes()
 
 	if(Counter>0)
 	{
-		ShowNotifyInfo(TEXT("Successfully renamed " + FString::FromInt(Counter) + " assets"));
+		MessageAction::ShowNotifyInfo(TEXT("Successfully renamed " + FString::FromInt(Counter) + " assets"));
 	}
 	
 }
@@ -117,7 +117,7 @@ void UQuickAction::RemoveUnusedAssets()
 
 	if (UnusedAssetsData.Num() == 0)
 	{
-		ShowMsgDialog(EAppMsgType::Ok,TEXT("No unused assets found among selected assets."), false);
+		MessageAction::ShowMsgDialog(EAppMsgType::Ok,TEXT("No unused assets found among selected assets."), false);
 		return;
 	}
 
@@ -127,7 +127,7 @@ void UQuickAction::RemoveUnusedAssets()
 	{
 		return;
 	}
-	ShowNotifyInfo(TEXT("Successfully deleted "+FString::FromInt(NumOfAssetsDeleted) +TEXT("unused assets.")));
+	MessageAction::ShowNotifyInfo(TEXT("Successfully deleted "+FString::FromInt(NumOfAssetsDeleted) +TEXT("unused assets.")));
 }
 
 void UQuickAction::FixUpRedirectors()

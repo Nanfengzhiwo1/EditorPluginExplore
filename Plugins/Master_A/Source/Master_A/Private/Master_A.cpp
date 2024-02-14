@@ -3,6 +3,7 @@
 #include "Master_A.h"
 
 #include "ContentBrowserModule.h"
+#include "Debug/MessageAction.h"
 
 #define LOCTEXT_NAMESPACE "FMaster_AModule"
 
