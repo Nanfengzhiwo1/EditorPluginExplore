@@ -4,6 +4,8 @@
 
 #include "ContentBrowserModule.h"
 #include "Debug/MessageAction.h"
+#include "EditorAssetLibrary.h"
+#include <Editor/UnrealEd/Public/ObjectTools.h>
 
 #define LOCTEXT_NAMESPACE "FMaster_AModule"
 
@@ -47,6 +49,8 @@ TSharedRef<FExtender> FMaster_AModule::CustomContentBrowserMenuExtender(const TA
 			TSharedPtr<FUICommandList>(),
 			// This is a delegate,no return type,one parameter
 			FMenuExtensionDelegate::CreateRaw(this,&FMaster_AModule::AddContentBrowersMenuEntry));
+			
+		FolderPathsSelected = SelectedPaths;
 	}
 
 	return MenuExtender;
@@ -69,6 +73,57 @@ void FMaster_AModule::AddContentBrowersMenuEntry(FMenuBuilder& MenuBuilder)
 
 void FMaster_AModule::OnDeleteUnusedAssetButtonClicked()
 {
+	if (FolderPathsSelected.Num()>1)
+	{
+		MessageAction::ShowMsgDialog(EAppMsgType::Ok,TEXT("You can only do this to one folder"));
+		return;
+	}
+	TArray<FString>AssetPathNames= UEditorAssetLibrary::ListAssets(FolderPathsSelected[0]);
+
+	if (AssetPathNames.Num()==0)
+	{
+		MessageAction::ShowMsgDialog(EAppMsgType::Ok, TEXT("No asset found under selected folder")); 
+		return;
+	}
+
+	EAppReturnType::Type ConfirmResult= MessageAction::ShowMsgDialog(EAppMsgType::YesNo, TEXT("A total of ")+FString::FromInt(AssetPathNames.Num())+TEXT(" found. \nWoudle you like to procceed?"));
+
+	if (ConfirmResult==EAppReturnType::No)
+	{
+		return;
+	}
+
+	TArray<FAssetData> UnusedAssetsData;
+
+	for (const FString& AssetPathName : AssetPathNames)
+	{
+		// Don't touch Developers folder and Collections in Content folder
+		if (AssetPathName.Contains(TEXT("Developers"))|| AssetPathName.Contains(TEXT("Collections")))
+		{
+			continue;
+		}
+
+		if (!UEditorAssetLibrary::DoesAssetExist(AssetPathName))
+		{
+			continue;
+		}
+
+		TArray<FString>AssetReferencers = UEditorAssetLibrary::FindPackageReferencersForAsset(AssetPathName);
+
+		if (AssetReferencers.Num()==0)
+		{
+			const FAssetData& UnusedAssetData = UEditorAssetLibrary::FindAssetData(AssetPathName);
+			UnusedAssetsData.Emplace(UnusedAssetData);
+		}
+	}
+	if (UnusedAssetsData.Num()>0)
+	{
+		ObjectTools::DeleteAssets(UnusedAssetsData);
+	}
+	else
+	{
+		MessageAction::ShowMsgDialog(EAppMsgType::Ok, TEXT("No unused asset found under selected folder"));
+	}
 }
 #pragma endregion
 

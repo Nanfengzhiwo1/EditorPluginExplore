@@ -18,6 +18,9 @@ private:
 	// In order to have better readability
 #pragma region ContentBrowserMenuExtention
 	void InitContentBrowserMenuExtention();
+
+	TArray<FString>FolderPathsSelected;
+
 	// Function: Define the position for inserting menu entry
 	TSharedRef<FExtender> CustomContentBrowserMenuExtender(const TArray<FString>& SelectedPaths);
 
