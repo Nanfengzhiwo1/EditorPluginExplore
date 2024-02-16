@@ -6,6 +6,8 @@
 #include "Debug/MessageAction.h"
 #include "EditorAssetLibrary.h"
 #include <Editor/UnrealEd/Public/ObjectTools.h>
+#include "AssetToolsModule.h"
+#include "AssetRegistryModule.h"
 
 #define LOCTEXT_NAMESPACE "FMaster_AModule"
 
@@ -32,10 +34,10 @@ void FMaster_AModule::InitContentBrowserMenuExtention()
 	FContentBrowserMenuExtender_SelectedPaths CustomContentBrowserMenuDelegate;
 	// bind this delegate to that function 
 	CustomContentBrowserMenuDelegate.BindRaw(this, &FMaster_AModule::CustomContentBrowserMenuExtender);
-	ContentBrowserModleMenuExtenders.Emplace(CustomContentBrowserMenuDelegate);
+	ContentBrowserModleMenuExtenders.Add(CustomContentBrowserMenuDelegate);
 	*/
 
-	ContentBrowserModleMenuExtenders.Emplace(FContentBrowserMenuExtender_SelectedPaths::CreateRaw(this, &FMaster_AModule::CustomContentBrowserMenuExtender));
+	ContentBrowserModleMenuExtenders.Add(FContentBrowserMenuExtender_SelectedPaths::CreateRaw(this, &FMaster_AModule::CustomContentBrowserMenuExtender));
 }
 TSharedRef<FExtender> FMaster_AModule::CustomContentBrowserMenuExtender(const TArray<FString>& SelectedPaths)
 {
@@ -93,6 +95,8 @@ void FMaster_AModule::OnDeleteUnusedAssetButtonClicked()
 		return;
 	}
 
+	FixUpRedirectors();
+
 	TArray<FAssetData> UnusedAssetsData;
 
 	for (const FString& AssetPathName : AssetPathNames)
@@ -113,7 +117,7 @@ void FMaster_AModule::OnDeleteUnusedAssetButtonClicked()
 		if (AssetReferencers.Num()==0)
 		{
 			const FAssetData& UnusedAssetData = UEditorAssetLibrary::FindAssetData(AssetPathName);
-			UnusedAssetsData.Emplace(UnusedAssetData);
+			UnusedAssetsData.Add(UnusedAssetData);
 		}
 	}
 	if (UnusedAssetsData.Num()>0)
@@ -124,6 +128,39 @@ void FMaster_AModule::OnDeleteUnusedAssetButtonClicked()
 	{
 		MessageAction::ShowMsgDialog(EAppMsgType::Ok, TEXT("No unused asset found under selected folder"));
 	}
+}
+void FMaster_AModule::FixUpRedirectors()
+{
+	TArray<UObjectRedirector* >RedirectorsToFixArray;
+
+	/*get redirectors*/
+	// access a  AssetRegistryModule,and store it in a local variable,only one instansce use "&",
+	FAssetRegistryModule& AssetRegistryModule = FModuleManager::Get().LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
+
+	FARFilter Filter;
+	// recursive pass to be true,it can go inside of all the subfolders
+	Filter.bRecursivePaths = true;
+	// which folder can go into
+	Filter.PackagePaths.Emplace("/Game");
+	// what's the name of the class that filter  !!!Class names are now represented by path names. Please use ClassPaths
+	Filter.ClassPaths.Emplace("/Game/ObjectRedirector");
+
+	TArray<FAssetData> OutRedirectors;
+
+	AssetRegistryModule.Get().GetAssets(Filter, OutRedirectors);
+
+	for (const FAssetData& RedirectorData : OutRedirectors)
+	{
+		if (UObjectRedirector* RedirectorToFix = Cast<UObjectRedirector>(RedirectorData.GetAsset()))
+		{
+			RedirectorsToFixArray.Add(RedirectorToFix);
+		}
+	}
+
+	/*fix redirectors*/
+	FAssetToolsModule& AssetToolsModule = FModuleManager::Get().LoadModuleChecked<FAssetToolsModule>(TEXT("AssetTools"));
+
+	AssetToolsModule.Get().FixupReferencers(RedirectorsToFixArray);
 }
 #pragma endregion
 

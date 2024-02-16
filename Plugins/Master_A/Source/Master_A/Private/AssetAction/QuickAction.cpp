@@ -7,7 +7,7 @@
 #include "EditorAssetLibrary.h"
 #include <Editor/UnrealEd/Public/ObjectTools.h>
 #include "AssetToolsModule.h"
-#include "AssetRegistry/AssetRegistryModule.h"
+#include "AssetRegistryModule.h"
 
 void UQuickAction::DuplicateAssets(int32 NumOfDuplicates)
 {
@@ -111,7 +111,7 @@ void UQuickAction::RemoveUnusedAssets()
 
 		if(AssetReferences.Num()==0)
 		{
-			UnusedAssetsData.Emplace(SelectedAssetData);
+			UnusedAssetsData.Add(SelectedAssetData);
 		}
 	}
 
@@ -139,12 +139,10 @@ void UQuickAction::FixUpRedirectors()
 	FAssetRegistryModule& AssetRegistryModule= FModuleManager::Get().LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
 
 	FARFilter Filter;
-	// recursive pass to be true,it can go inside of all the subfolders
-	Filter.bRecursivePaths=true;
-	// which folder can go into
+	Filter.bRecursivePaths = true;
 	Filter.PackagePaths.Emplace("/Game");
-	// what's the name of the class that filter
 	Filter.ClassNames.Emplace("ObjectRedirector");
+
 	TArray<FAssetData> OutRedirectors;
 	
 	AssetRegistryModule.Get().GetAssets(Filter,OutRedirectors);
@@ -153,7 +151,7 @@ void UQuickAction::FixUpRedirectors()
 	{
 		if (UObjectRedirector* RedirectorToFix = Cast<UObjectRedirector>(OutRedirector.GetAsset()))
 		{
-			RedirectorsToFixArray.Emplace(RedirectorToFix);
+			RedirectorsToFixArray.Add(RedirectorToFix);
 		}
 	}
 

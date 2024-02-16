@@ -29,5 +29,7 @@ private:
 
 	// Function: Excute the Action
 	void OnDeleteUnusedAssetButtonClicked();
+
+	void FixUpRedirectors();
 #pragma endregion 
 };
