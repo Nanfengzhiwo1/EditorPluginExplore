@@ -77,6 +77,18 @@ void FMaster_AModule::AddContentBrowersMenuEntry(FMenuBuilder& MenuBuilder)
 		// UI actions,this is a delegate,no return type,no parameter
 		FExecuteAction::CreateRaw(this, &FMaster_AModule::OnDeleteUnusedAssetButtonClicked)
 	);
+
+	MenuBuilder.AddMenuEntry
+	(
+		// title
+		FText::FromString(TEXT("Delete Empty Folders")),
+		// tips
+		FText::FromString(TEXT("Safely delete all empty folders")),
+		// icon
+		FSlateIcon(),
+		// UI actions,this is a delegate,no return type,no parameter
+		FExecuteAction::CreateRaw(this, &FMaster_AModule::OnDeleteEmptyFoldersButtonClicked)
+	);
 }
 
 void FMaster_AModule::OnDeleteUnusedAssetButtonClicked()
@@ -135,6 +147,9 @@ void FMaster_AModule::OnDeleteUnusedAssetButtonClicked()
 	{
 		MessageAction::ShowMsgDialog(EAppMsgType::Ok, TEXT("No unused asset found under selected folder"),false);
 	}
+}
+void FMaster_AModule::OnDeleteEmptyFoldersButtonClicked()
+{
 }
 void FMaster_AModule::FixUpRedirectors()
 {
