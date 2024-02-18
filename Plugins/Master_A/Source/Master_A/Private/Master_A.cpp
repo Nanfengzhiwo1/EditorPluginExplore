@@ -8,6 +8,7 @@
 #include <Editor/UnrealEd/Public/ObjectTools.h>
 #include "AssetToolsModule.h"
 #include "AssetRegistryModule.h"
+#include "SlateWidgets/AdvanceDeletionWidget.h"
 
 #define LOCTEXT_NAMESPACE "FMaster_AModule"
 
@@ -262,7 +263,10 @@ void FMaster_AModule::RegisterAdvanceDeletionTab()
 
 TSharedRef<SDockTab> FMaster_AModule::OnSpawnAdvanceDeltionTab(const FSpawnTabArgs& SpawnTabArgs)
 {
-	return SNew(SDockTab).TabRole(ETabRole::NomadTab);
+	return SNew(SDockTab).TabRole(ETabRole::NomadTab)
+		[
+			SNew(SAdvanceDeletionTab).TextString(TEXT("11111111111"))
+		];
 }
 
 
