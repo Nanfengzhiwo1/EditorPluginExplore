@@ -15,6 +15,7 @@ void FMaster_AModule::StartupModule()
 {
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
 	InitContentBrowserMenuExtention();
+	RegisterAdvanceDeletionTab();
 }
 
 void FMaster_AModule::ShutdownModule()
@@ -33,7 +34,7 @@ void FMaster_AModule::InitContentBrowserMenuExtention()
 	/*
 	// This is a delegate,return type is TSharedRef<FExtender>
 	FContentBrowserMenuExtender_SelectedPaths CustomContentBrowserMenuDelegate;
-	// bind this delegate to that function 
+	// bind this delegate to that function
 	CustomContentBrowserMenuDelegate.BindRaw(this, &FMaster_AModule::CustomContentBrowserMenuExtender);
 	ContentBrowserModleMenuExtenders.Add(CustomContentBrowserMenuDelegate);
 	*/
@@ -46,7 +47,7 @@ TSharedRef<FExtender> FMaster_AModule::CustomContentBrowserMenuExtender(const TA
 {
 	TSharedRef<FExtender> MenuExtender(new FExtender());
 
-	if (SelectedPaths.Num()>0)
+	if (SelectedPaths.Num() > 0)
 	{
 		// add extention hook
 		MenuExtender->AddMenuExtension(
@@ -55,8 +56,8 @@ TSharedRef<FExtender> FMaster_AModule::CustomContentBrowserMenuExtender(const TA
 			// add custom hot keys
 			TSharedPtr<FUICommandList>(),
 			// This is a delegate,no return type,one parameter
-			FMenuExtensionDelegate::CreateRaw(this,&FMaster_AModule::AddContentBrowersMenuEntry));
-			
+			FMenuExtensionDelegate::CreateRaw(this, &FMaster_AModule::AddContentBrowersMenuEntry));
+
 		FolderPathsSelected = SelectedPaths;
 	}
 
@@ -105,23 +106,23 @@ void FMaster_AModule::AddContentBrowersMenuEntry(FMenuBuilder& MenuBuilder)
 
 void FMaster_AModule::OnDeleteUnusedAssetButtonClicked()
 {
-	if (FolderPathsSelected.Num()>1)
+	if (FolderPathsSelected.Num() > 1)
 	{
-		MessageAction::ShowMsgDialog(EAppMsgType::Ok,TEXT("You can only do this to one folder"));
+		MessageAction::ShowMsgDialog(EAppMsgType::Ok, TEXT("You can only do this to one folder"));
 		return;
 	}
-	TArray<FString>AssetPathNames= UEditorAssetLibrary::ListAssets(FolderPathsSelected[0]);
+	TArray<FString>AssetPathNames = UEditorAssetLibrary::ListAssets(FolderPathsSelected[0]);
 
 	// Whether there are assets under the folder
-	if (AssetPathNames.Num()==0)
+	if (AssetPathNames.Num() == 0)
 	{
-		MessageAction::ShowMsgDialog(EAppMsgType::Ok, TEXT("No asset found under selected folder"),false); 
+		MessageAction::ShowMsgDialog(EAppMsgType::Ok, TEXT("No asset found under selected folder"), false);
 		return;
 	}
 
-	EAppReturnType::Type ConfirmResult= MessageAction::ShowMsgDialog(EAppMsgType::YesNo, TEXT("A total of ")+FString::FromInt(AssetPathNames.Num())+TEXT(" assets need to be checked. \nWoulde you like to procceed?"),false);
+	EAppReturnType::Type ConfirmResult = MessageAction::ShowMsgDialog(EAppMsgType::YesNo, TEXT("A total of ") + FString::FromInt(AssetPathNames.Num()) + TEXT(" assets need to be checked. \nWoulde you like to procceed?"), false);
 
-	if (ConfirmResult==EAppReturnType::No)
+	if (ConfirmResult == EAppReturnType::No)
 	{
 		return;
 	}
@@ -133,7 +134,7 @@ void FMaster_AModule::OnDeleteUnusedAssetButtonClicked()
 	for (const FString& AssetPathName : AssetPathNames)
 	{
 		// Don't touch these folders in Content folder
-		if (AssetPathName.Contains(TEXT("Developers"))|| AssetPathName.Contains(TEXT("Collections")) ||AssetPathName.Contains(TEXT("__ExternalActors__")) ||AssetPathName.Contains(TEXT("__ExternalObjects__")))
+		if (AssetPathName.Contains(TEXT("Developers")) || AssetPathName.Contains(TEXT("Collections")) || AssetPathName.Contains(TEXT("__ExternalActors__")) || AssetPathName.Contains(TEXT("__ExternalObjects__")))
 		{
 			continue;
 		}
@@ -145,25 +146,25 @@ void FMaster_AModule::OnDeleteUnusedAssetButtonClicked()
 
 		TArray<FString>AssetReferencers = UEditorAssetLibrary::FindPackageReferencersForAsset(AssetPathName);
 
-		if (AssetReferencers.Num()==0)
+		if (AssetReferencers.Num() == 0)
 		{
 			const FAssetData& UnusedAssetData = UEditorAssetLibrary::FindAssetData(AssetPathName);
 			UnusedAssetsData.Add(UnusedAssetData);
 		}
 	}
-	if (UnusedAssetsData.Num()>0)
+	if (UnusedAssetsData.Num() > 0)
 	{
 		ObjectTools::DeleteAssets(UnusedAssetsData);
 	}
 	else
 	{
-		MessageAction::ShowMsgDialog(EAppMsgType::Ok, TEXT("No unused asset found under selected folder"),false);
+		MessageAction::ShowMsgDialog(EAppMsgType::Ok, TEXT("No unused asset found under selected folder"), false);
 	}
 }
 void FMaster_AModule::OnDeleteEmptyFoldersButtonClicked()
 {
 	FixUpRedirectors();
-	TArray<FString>FolderPathsArray = UEditorAssetLibrary::ListAssets(FolderPathsSelected[0],true,true);
+	TArray<FString>FolderPathsArray = UEditorAssetLibrary::ListAssets(FolderPathsSelected[0], true, true);
 	uint32 Counter = 0;
 
 	FString EmptyFolderPathsNames;
@@ -187,32 +188,32 @@ void FMaster_AModule::OnDeleteEmptyFoldersButtonClicked()
 		}
 	}
 
-	if (EmptyFoldersPathsArray.Num()==0)
+	if (EmptyFoldersPathsArray.Num() == 0)
 	{
-		MessageAction::ShowMsgDialog(EAppMsgType::Ok,TEXT("No empty folder found under selected folder"),false);
+		MessageAction::ShowMsgDialog(EAppMsgType::Ok, TEXT("No empty folder found under selected folder"), false);
 		return;
 	}
 
-	EAppReturnType::Type ConfirmResult= MessageAction::ShowMsgDialog(EAppMsgType::OkCancel, TEXT("Empty folders found in :\n") + EmptyFolderPathsNames + TEXT("\nWould you like to delete all?"), false);
+	EAppReturnType::Type ConfirmResult = MessageAction::ShowMsgDialog(EAppMsgType::OkCancel, TEXT("Empty folders found in :\n") + EmptyFolderPathsNames + TEXT("\nWould you like to delete all?"), false);
 
-	if (ConfirmResult==EAppReturnType::Cancel)
+	if (ConfirmResult == EAppReturnType::Cancel)
 	{
 		return;
 	}
 
 	for (const FString& EmptyFolderPath : EmptyFoldersPathsArray)
 	{
-		UEditorAssetLibrary::DeleteDirectory(EmptyFolderPath) ? ++Counter : MessageAction::ScreenPrint(TEXT("Failed to delete"+EmptyFolderPath),FColor::Red);
+		UEditorAssetLibrary::DeleteDirectory(EmptyFolderPath) ? ++Counter : MessageAction::ScreenPrint(TEXT("Failed to delete" + EmptyFolderPath), FColor::Red);
 	}
 
 	if (Counter > 0)
 	{
-		MessageAction::ShowNotifyInfo(TEXT("Successfully deleted ") + FString::FromInt(Counter)+TEXT(" folders"));
+		MessageAction::ShowNotifyInfo(TEXT("Successfully deleted ") + FString::FromInt(Counter) + TEXT(" folders"));
 	}
 }
 void FMaster_AModule::OnAdvanceDeletionButtonClicked()
 {
-
+	FGlobalTabmanager::Get()->TryInvokeTab(FName("Advance Deletion"));
 }
 void FMaster_AModule::FixUpRedirectors()
 {
@@ -228,7 +229,7 @@ void FMaster_AModule::FixUpRedirectors()
 	// which folder can go into
 	Filter.PackagePaths.Emplace("/Game");
 	// what's the name of the class that filter  !!!Class names are now represented by path names. Please use ClassPaths
-	Filter.ClassPaths.Emplace("/Game/ObjectRedirector");
+	Filter.ClassPaths.Emplace("/Script/ObjectRedirector");
 
 	TArray<FAssetData> OutRedirectors;
 
@@ -255,8 +256,16 @@ void FMaster_AModule::FixUpRedirectors()
 #pragma region CustomEditorTab
 void FMaster_AModule::RegisterAdvanceDeletionTab()
 {
-
+	//FOnSpawnTab:one return value (TSharedRef<SDockTab>),one Parameter(const FSpawnTabArgs& )
+	FGlobalTabmanager::Get()->RegisterNomadTabSpawner(FName("AdvanceDeletion"), FOnSpawnTab::CreateRaw(this, &FMaster_AModule::OnSpawnAdvanceDeltionTab)).SetDisplayName(FText::FromString(TEXT("Advance Deletion")));
 }
+
+TSharedRef<SDockTab> FMaster_AModule::OnSpawnAdvanceDeltionTab(const FSpawnTabArgs& SpawnTabArgs)
+{
+	return SNew(SDockTab).TabRole(ETabRole::NomadTab);
+}
+
+
 #pragma endregion
 
 #undef LOCTEXT_NAMESPACE
