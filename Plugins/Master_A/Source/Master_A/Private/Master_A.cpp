@@ -89,6 +89,18 @@ void FMaster_AModule::AddContentBrowersMenuEntry(FMenuBuilder& MenuBuilder)
 		// UI actions,this is a delegate,no return type,no parameter
 		FExecuteAction::CreateRaw(this, &FMaster_AModule::OnDeleteEmptyFoldersButtonClicked)
 	);
+
+	MenuBuilder.AddMenuEntry
+	(
+		// title
+		FText::FromString(TEXT("Advance Deletion")),
+		// tips
+		FText::FromString(TEXT("List assets by specific condition in a tab for deleting")),
+		// icon
+		FSlateIcon(),
+		// UI actions,this is a delegate,no return type,no parameter
+		FExecuteAction::CreateRaw(this, &FMaster_AModule::OnAdvanceDeletionButtonClicked)
+	);
 }
 
 void FMaster_AModule::OnDeleteUnusedAssetButtonClicked()
@@ -198,6 +210,10 @@ void FMaster_AModule::OnDeleteEmptyFoldersButtonClicked()
 		MessageAction::ShowNotifyInfo(TEXT("Successfully deleted ") + FString::FromInt(Counter)+TEXT(" folders"));
 	}
 }
+void FMaster_AModule::OnAdvanceDeletionButtonClicked()
+{
+
+}
 void FMaster_AModule::FixUpRedirectors()
 {
 	TArray<UObjectRedirector* >RedirectorsToFixArray;
@@ -230,6 +246,16 @@ void FMaster_AModule::FixUpRedirectors()
 	FAssetToolsModule& AssetToolsModule = FModuleManager::Get().LoadModuleChecked<FAssetToolsModule>(TEXT("AssetTools"));
 
 	AssetToolsModule.Get().FixupReferencers(RedirectorsToFixArray);
+}
+
+
+
+#pragma endregion
+
+#pragma region CustomEditorTab
+void FMaster_AModule::RegisterAdvanceDeletionTab()
+{
+
 }
 #pragma endregion
 

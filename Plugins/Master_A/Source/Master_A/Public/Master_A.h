@@ -31,6 +31,12 @@ private:
 	void OnDeleteUnusedAssetButtonClicked();
 
 	void OnDeleteEmptyFoldersButtonClicked();
+
+	void OnAdvanceDeletionButtonClicked();
 	void FixUpRedirectors();
 #pragma endregion 
+
+#pragma region CustomEditorTab
+	void RegisterAdvanceDeletionTab();
+#pragma endregion
 };
