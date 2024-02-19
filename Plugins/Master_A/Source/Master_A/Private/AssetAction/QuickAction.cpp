@@ -141,7 +141,7 @@ void UQuickAction::FixUpRedirectors()
 	FARFilter Filter;
 	Filter.bRecursivePaths = true;
 	Filter.PackagePaths.Emplace("/Game");
-	Filter.ClassNames.Emplace("ObjectRedirector");
+	Filter.ClassPaths.Emplace("/Script/ObjectRedirector");
 
 	TArray<FAssetData> OutRedirectors;
 	
