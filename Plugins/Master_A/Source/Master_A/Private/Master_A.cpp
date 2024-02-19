@@ -265,8 +265,27 @@ TSharedRef<SDockTab> FMaster_AModule::OnSpawnAdvanceDeltionTab(const FSpawnTabAr
 {
 	return SNew(SDockTab).TabRole(ETabRole::NomadTab)
 		[
-			SNew(SAdvanceDeletionTab).TextString(TEXT("11111111111"))
+			SNew(SAdvanceDeletionTab).AssetDataToStore(GetAllAssetDataUnderSelectedFolder())
 		];
+}
+
+TArray<TSharedPtr<FAssetData>> FMaster_AModule::GetAllAssetDataUnderSelectedFolder()
+{
+	TArray<TSharedPtr<FAssetData>>AvaiableAssetsData;
+	TArray<FString>AssetPathNames=UEditorAssetLibrary::ListAssets(FolderPathsSelected[0]);
+	
+	for (const FString& AssetPathName : AssetPathNames)
+	{
+		// Don't touch these folders in Content folder
+		if (AssetPathName.Contains(TEXT("Developers")) || AssetPathName.Contains(TEXT("Collections")) || AssetPathName.Contains(TEXT("__ExternalActors__")) || AssetPathName.Contains(TEXT("__ExternalObjects__")))
+		{
+			continue;
+		}
+
+		const FAssetData Data=UEditorAssetLibrary::FindAssetData(AssetPathName);
+		AvaiableAssetsData.Add(MakeShared<FAssetData>(Data));
+	}
+	return AvaiableAssetsData;
 }
 
 
