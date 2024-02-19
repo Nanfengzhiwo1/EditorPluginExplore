@@ -26,7 +26,7 @@ public class Master_A : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core","Blutility","EditorScriptingUtilities","Niagara","UMG","UnrealEd","AssetTools","ContentBrowser"
+				"Core","Blutility","EditorScriptingUtilities","Niagara","UMG","UnrealEd","AssetTools","ContentBrowser","InputCore"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

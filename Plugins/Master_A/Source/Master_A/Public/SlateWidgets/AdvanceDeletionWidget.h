@@ -15,4 +15,6 @@ public:
 
 private:
 	TArray<TSharedPtr<FAssetData>>StoredAssetsData;
+
+	TSharedRef<ITableRow>OnGenerateRowForList(TSharedPtr<FAssetData>AssetDataToDisplay,const TSharedRef<STableViewBase>& OwnerTable);
 };
