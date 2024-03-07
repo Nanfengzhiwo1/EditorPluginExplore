@@ -2,8 +2,9 @@
 
 
 #include "SlateWidgets/AdvanceDeletionWidget.h"
-
+#include "SlateBasics.h"
 #include "Widgets/Layout/SScrollBox.h"
+#include "Debug/MessageAction.h"
 
 void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 {
@@ -59,13 +60,63 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 
 TSharedRef<ITableRow> SAdvanceDeletionTab::OnGenerateRowForList(TSharedPtr<FAssetData> AssetDataToDisplay,const TSharedRef<STableViewBase>& OwnerTable)
 {
+	if (!AssetDataToDisplay.IsValid())
+	{
+		return SNew(STableRow<TSharedPtr<FAssetData>>,OwnerTable);
+	}
 	const FString DisplayAssetName = AssetDataToDisplay->AssetName.ToString();
 	
 	TSharedRef<STableRow<TSharedPtr<FAssetData>>> ListViewRowWidget =
 	SNew(STableRow<TSharedPtr<FAssetData>>, OwnerTable)
 	[
+		SNew(SHorizontalBox)
+		// display checkboxs
+		+SHorizontalBox::Slot()
+		.HAlign(HAlign_Left)
+		.VAlign(VAlign_Center)
+		.FillWidth(.05f)
+		[
+			ConstructCheckBox(AssetDataToDisplay)
+		]
+
+		// display asset class names
+
+		// display asset names
+		+SHorizontalBox::Slot()
+		[
 		SNew(STextBlock)
 		.Text(FText::FromString(DisplayAssetName))
+		]
+		// display delete buttons
 	];
 	return ListViewRowWidget;
+}
+
+TSharedRef<SCheckBox> SAdvanceDeletionTab::ConstructCheckBox(const TSharedPtr<FAssetData>& AssetDataToDisplay)
+{
+	TSharedRef<SCheckBox>ConstructedCheckBox=SNew(SCheckBox)
+	.Type(ESlateCheckBoxType::CheckBox)
+	.OnCheckStateChanged(this,&SAdvanceDeletionTab::OnCheckBoxStateChanged,AssetDataToDisplay)
+	.Visibility(EVisibility::Visible);
+
+	return ConstructedCheckBox;
+	
+}
+
+void SAdvanceDeletionTab::OnCheckBoxStateChanged(ECheckBoxState NewState, TSharedPtr<FAssetData> AssetData)
+{
+	switch (NewState)
+	{
+	case ECheckBoxState::Unchecked:
+		MessageAction::LogPrint(AssetData->AssetName.ToString()+TEXT(" is unchecked"));
+		break;
+	case ECheckBoxState::Checked:
+		MessageAction::LogPrint(AssetData->AssetName.ToString()+TEXT(" is checked"));
+		break;
+	case ECheckBoxState::Undetermined:
+		break;
+	default:
+		break;
+	}
+	MessageAction::LogPrint(AssetData->AssetName.ToString());
 }
