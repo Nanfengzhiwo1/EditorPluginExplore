@@ -3,7 +3,6 @@
 
 #include "SlateWidgets/AdvanceDeletionWidget.h"
 #include "SlateBasics.h"
-#include "Widgets/Layout/SScrollBox.h"
 #include "Debug/MessageAction.h"
 
 void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
@@ -58,49 +57,64 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 	];
 }
 
-TSharedRef<ITableRow> SAdvanceDeletionTab::OnGenerateRowForList(TSharedPtr<FAssetData> AssetDataToDisplay,const TSharedRef<STableViewBase>& OwnerTable)
+TSharedRef<ITableRow> SAdvanceDeletionTab::OnGenerateRowForList(TSharedPtr<FAssetData> AssetDataToDisplay,
+                                                                const TSharedRef<STableViewBase>& OwnerTable)
 {
 	if (!AssetDataToDisplay.IsValid())
 	{
-		return SNew(STableRow<TSharedPtr<FAssetData>>,OwnerTable);
+		return SNew(STableRow<TSharedPtr<FAssetData>>, OwnerTable);
 	}
+
+	const FString DisplayAssetClassName = AssetDataToDisplay->GetClass()->GetName();
+	// AssetClassPath repalce AssetClass
+
 	const FString DisplayAssetName = AssetDataToDisplay->AssetName.ToString();
-	
+
+	FSlateFontInfo AssetClassNameFont = GetEmboseedTextFont();
+	AssetClassNameFont.Size = 10;
+
+	FSlateFontInfo AssetNameFont = GetEmboseedTextFont();
+	AssetNameFont.Size = 10;
+
 	TSharedRef<STableRow<TSharedPtr<FAssetData>>> ListViewRowWidget =
-	SNew(STableRow<TSharedPtr<FAssetData>>, OwnerTable)
-	[
-		SNew(SHorizontalBox)
-		// display checkboxs
-		+SHorizontalBox::Slot()
-		.HAlign(HAlign_Left)
-		.VAlign(VAlign_Center)
-		.FillWidth(.05f)
+		SNew(STableRow<TSharedPtr<FAssetData>>, OwnerTable)
 		[
-			ConstructCheckBox(AssetDataToDisplay)
-		]
+			SNew(SHorizontalBox)
+			// display checkboxs
+			+ SHorizontalBox::Slot()
+			  .HAlign(HAlign_Left)
+			  .VAlign(VAlign_Center)
+			  .FillWidth(.05f)
+			[
+				ConstructCheckBox(AssetDataToDisplay)
+			]
 
-		// display asset class names
-
-		// display asset names
-		+SHorizontalBox::Slot()
-		[
-		SNew(STextBlock)
-		.Text(FText::FromString(DisplayAssetName))
-		]
-		// display delete buttons
-	];
+			// display asset class names
+			+ SHorizontalBox::Slot()
+			  .HAlign(HAlign_Center)
+			  .VAlign(VAlign_Fill)
+			  .FillWidth(.2f)
+			[
+				ConstructTextForRowWidget(DisplayAssetClassName, AssetClassNameFont)
+			]
+			// display asset names
+			+ SHorizontalBox::Slot()
+			[
+				ConstructTextForRowWidget(DisplayAssetName, AssetNameFont)
+			]
+			// display delete buttons
+		];
 	return ListViewRowWidget;
 }
 
 TSharedRef<SCheckBox> SAdvanceDeletionTab::ConstructCheckBox(const TSharedPtr<FAssetData>& AssetDataToDisplay)
 {
-	TSharedRef<SCheckBox>ConstructedCheckBox=SNew(SCheckBox)
+	TSharedRef<SCheckBox> ConstructedCheckBox = SNew(SCheckBox)
 	.Type(ESlateCheckBoxType::CheckBox)
-	.OnCheckStateChanged(this,&SAdvanceDeletionTab::OnCheckBoxStateChanged,AssetDataToDisplay)
+	.OnCheckStateChanged(this, &SAdvanceDeletionTab::OnCheckBoxStateChanged, AssetDataToDisplay)
 	.Visibility(EVisibility::Visible);
 
 	return ConstructedCheckBox;
-	
 }
 
 void SAdvanceDeletionTab::OnCheckBoxStateChanged(ECheckBoxState NewState, TSharedPtr<FAssetData> AssetData)
@@ -108,10 +122,10 @@ void SAdvanceDeletionTab::OnCheckBoxStateChanged(ECheckBoxState NewState, TShare
 	switch (NewState)
 	{
 	case ECheckBoxState::Unchecked:
-		MessageAction::LogPrint(AssetData->AssetName.ToString()+TEXT(" is unchecked"));
+		MessageAction::LogPrint(AssetData->AssetName.ToString() + TEXT(" is unchecked"));
 		break;
 	case ECheckBoxState::Checked:
-		MessageAction::LogPrint(AssetData->AssetName.ToString()+TEXT(" is checked"));
+		MessageAction::LogPrint(AssetData->AssetName.ToString() + TEXT(" is checked"));
 		break;
 	case ECheckBoxState::Undetermined:
 		break;
@@ -120,3 +134,15 @@ void SAdvanceDeletionTab::OnCheckBoxStateChanged(ECheckBoxState NewState, TShare
 	}
 	MessageAction::LogPrint(AssetData->AssetName.ToString());
 }
+
+TSharedRef<STextBlock> SAdvanceDeletionTab::ConstructTextForRowWidget(const FString& TextContent, const FSlateFontInfo& FontToUse)
+{
+	TSharedRef<STextBlock>ConstructedTextBlock=SNew(STextBlock)
+		.Text(FText::FromString(TextContent))
+		.Font(FontToUse)
+		.ColorAndOpacity(FColor::White);
+	return ConstructedTextBlock;
+}
+
+
+
