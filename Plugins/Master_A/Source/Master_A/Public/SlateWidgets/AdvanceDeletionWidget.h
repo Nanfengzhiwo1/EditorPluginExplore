@@ -16,6 +16,11 @@ public:
 private:
 	TArray<TSharedPtr<FAssetData>>StoredAssetsData;
 
+	TSharedRef<SListView<TSharedPtr<FAssetData>>>ConstructAssetListView();
+	TSharedPtr<SListView<TSharedPtr<FAssetData>>>ConstructedAssetListView;
+	
+	
+
 	TSharedRef<ITableRow>OnGenerateRowForList(TSharedPtr<FAssetData>AssetDataToDisplay,const TSharedRef<STableViewBase>& OwnerTable);
 	
 	TSharedRef<SCheckBox>ConstructCheckBox(const TSharedPtr<FAssetData>&AssetDataToDisplay);
@@ -27,4 +32,6 @@ private:
 	FReply OnDeleteButtonClicked(TSharedPtr<FAssetData> ClickedAssetData);
 
 	FSlateFontInfo GetEmboseedTextFont() const {return FCoreStyle::Get().GetFontStyle(FName("EmbossedText"));}
+
+	void RefreshAssetListView();
 };
