@@ -74,10 +74,10 @@ TSharedRef<ITableRow> SAdvanceDeletionTab::OnGenerateRowForList(TSharedPtr<FAsse
 	AssetClassNameFont.Size = 10;
 
 	FSlateFontInfo AssetNameFont = GetEmboseedTextFont();
-	AssetNameFont.Size = 10;
+	AssetNameFont.Size = 15;
 
 	TSharedRef<STableRow<TSharedPtr<FAssetData>>> ListViewRowWidget =
-		SNew(STableRow<TSharedPtr<FAssetData>>, OwnerTable)
+		SNew(STableRow<TSharedPtr<FAssetData>>, OwnerTable).Padding(FMargin(5.f))
 		[
 			SNew(SHorizontalBox)
 			// display checkboxs
@@ -93,16 +93,24 @@ TSharedRef<ITableRow> SAdvanceDeletionTab::OnGenerateRowForList(TSharedPtr<FAsse
 			+ SHorizontalBox::Slot()
 			  .HAlign(HAlign_Center)
 			  .VAlign(VAlign_Fill)
-			  .FillWidth(.2f)
+			  .FillWidth(.5f)
 			[
 				ConstructTextForRowWidget(DisplayAssetClassName, AssetClassNameFont)
 			]
 			// display asset names
 			+ SHorizontalBox::Slot()
+			.HAlign(HAlign_Left)
+			.VAlign(VAlign_Fill)
 			[
 				ConstructTextForRowWidget(DisplayAssetName, AssetNameFont)
 			]
 			// display delete buttons
+			+ SHorizontalBox::Slot()
+			.HAlign(HAlign_Right)
+			.VAlign(VAlign_Fill)
+			[
+				ConstructButtonForRowWidget(AssetDataToDisplay)
+			]
 		];
 	return ListViewRowWidget;
 }
@@ -142,6 +150,20 @@ TSharedRef<STextBlock> SAdvanceDeletionTab::ConstructTextForRowWidget(const FStr
 		.Font(FontToUse)
 		.ColorAndOpacity(FColor::White);
 	return ConstructedTextBlock;
+}
+
+TSharedRef<SButton> SAdvanceDeletionTab::ConstructButtonForRowWidget(const TSharedPtr<FAssetData>& AssetDataToDisplay)
+{
+	TSharedRef<SButton> ConstructedButton=SNew(SButton)
+	.Text(FText::FromString(TEXT("Delete")))
+	.OnClicked(this,&SAdvanceDeletionTab::OnDeleteButtonClicked,AssetDataToDisplay);
+	return ConstructedButton;
+}
+
+FReply SAdvanceDeletionTab::OnDeleteButtonClicked(TSharedPtr<FAssetData> ClickedAssetData)
+{
+	MessageAction::LogPrint(ClickedAssetData->AssetName.ToString()+TEXT(" is clicked"));
+	return  FReply::Handled();
 }
 
 
