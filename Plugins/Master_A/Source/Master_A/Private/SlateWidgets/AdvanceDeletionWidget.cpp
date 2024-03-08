@@ -2,6 +2,8 @@
 
 
 #include "SlateWidgets/AdvanceDeletionWidget.h"
+
+#include "Master_A.h"
 #include "SlateBasics.h"
 #include "Debug/MessageAction.h"
 
@@ -162,7 +164,12 @@ TSharedRef<SButton> SAdvanceDeletionTab::ConstructButtonForRowWidget(const TShar
 
 FReply SAdvanceDeletionTab::OnDeleteButtonClicked(TSharedPtr<FAssetData> ClickedAssetData)
 {
-	MessageAction::LogPrint(ClickedAssetData->AssetName.ToString()+TEXT(" is clicked"));
+	FMaster_AModule&Master_AModule= FModuleManager::LoadModuleChecked<FMaster_AModule>(TEXT("Master_A"));
+	const bool bAssetDeleted=Master_AModule.DeleteSingleAssetForAssetList(*ClickedAssetData.Get());
+	if (bAssetDeleted)
+	{
+		//Refresh the list
+	}	
 	return  FReply::Handled();
 }
 

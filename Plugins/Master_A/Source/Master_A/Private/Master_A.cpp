@@ -287,7 +287,20 @@ TArray<TSharedPtr<FAssetData>> FMaster_AModule::GetAllAssetDataUnderSelectedFold
 	}
 	return AvaiableAssetsData;
 }
+#pragma endregion 
 
+#pragma region ProccessDataForAdvanceDeletionTab
+
+bool FMaster_AModule::DeleteSingleAssetForAssetList(const FAssetData& AssetDataToDelete)
+{
+	TArray<FAssetData>AssetDataForDeletion;
+	AssetDataForDeletion.Add(AssetDataToDelete);
+	if (ObjectTools::DeleteAssets(AssetDataForDeletion)>0)
+	{
+		return  true;
+	}
+	return  false;
+}
 
 #pragma endregion
 
