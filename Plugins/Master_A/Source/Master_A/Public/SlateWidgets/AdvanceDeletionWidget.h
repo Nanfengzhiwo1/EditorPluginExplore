@@ -44,7 +44,10 @@ private:
 	FReply OnSelectAllButtonClicked();
 	FReply OnDeselectAllButtonClicked();
 
-#pragma endregion 	
+#pragma endregion
+
+	TArray<TSharedPtr<FAssetData>>AssetsDataToDeletArray;
+	
 	FSlateFontInfo GetEmboseedTextFont() const {return FCoreStyle::Get().GetFontStyle(FName("EmbossedText"));}
 	TSharedRef<STextBlock>ConstructTextForTabButtons(const FString& TextContent);
 };

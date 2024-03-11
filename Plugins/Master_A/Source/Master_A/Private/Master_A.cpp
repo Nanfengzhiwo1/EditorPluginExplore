@@ -302,6 +302,15 @@ bool FMaster_AModule::DeleteSingleAssetForAssetList(const FAssetData& AssetDataT
 	return  false;
 }
 
+bool FMaster_AModule::DeleteMultipleAssetsForAssetList(const TArray<FAssetData>& AssetsToDelete)
+{
+	if (ObjectTools::DeleteAssets(AssetsToDelete)>0)
+	{
+		return true;
+	}
+	return false;
+}
+
 #pragma endregion
 
 #undef LOCTEXT_NAMESPACE
