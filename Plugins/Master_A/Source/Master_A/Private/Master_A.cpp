@@ -311,6 +311,21 @@ bool FMaster_AModule::DeleteMultipleAssetsForAssetList(const TArray<FAssetData>&
 	return false;
 }
 
+void FMaster_AModule::ListUnusedAssetsForAssetList(const TArray<TSharedPtr<FAssetData>>& AssetDataToFilter,
+	TArray<TSharedPtr<FAssetData>>& OutUnusedAssetsData)
+{
+	OutUnusedAssetsData.Empty();
+	for (const TSharedPtr<FAssetData>&DataSharedPtr:AssetDataToFilter)
+	{
+		
+		TArray<FString>AssetReferencers= UEditorAssetLibrary::FindPackageReferencersForAsset(DataSharedPtr->ObjectPath.ToString());
+		if (AssetReferencers.Num()==0)
+		{
+			OutUnusedAssetsData.Add(DataSharedPtr);
+		}
+	}
+}
+
 #pragma endregion
 
 #undef LOCTEXT_NAMESPACE
