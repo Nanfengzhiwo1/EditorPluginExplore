@@ -7,6 +7,8 @@
 #include "SlateBasics.h"
 #include "Debug/MessageAction.h"
 
+#define ListAll TEXT("List All Available Assets")
+
 void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 {
 	bCanSupportFocus = true;
@@ -14,6 +16,8 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 	StoredAssetsData = InArgs._AssetDataToStore;
 	CheckBoxesArray.Empty();
 	AssetsDataToDeletArray.Empty();
+
+	ComboBoxSourceItems.Add(MakeShared<FString>(ListAll));
 	
 	FSlateFontInfo TitleTextFont = FCoreStyle::Get().GetFontStyle(FName("EmbossedText"));
 	TitleTextFont.Size = 30;
@@ -38,6 +42,13 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 		.AutoHeight()
 		[
 			SNew(SHorizontalBox)
+
+			// Combo Box
+			+SHorizontalBox::Slot()
+			.AutoWidth()
+			[
+				ConstructComboBox()
+			]
 		]
 		// asset list
 		+ SVerticalBox::Slot()
@@ -95,6 +106,35 @@ void SAdvanceDeletionTab::RefreshAssetListView()
 		ConstructedAssetListView->RebuildList();
 	}
 }
+#pragma region ComboBoxForListingCondition
+TSharedRef<SComboBox<TSharedPtr<FString>>> SAdvanceDeletionTab::ConstructComboBox()
+{
+	TSharedRef<SComboBox<TSharedPtr<FString>>>ConstructedComboBox=SNew(SComboBox<TSharedPtr<FString>>)
+	.OptionsSource(&ComboBoxSourceItems)
+	.OnGenerateWidget(this,&SAdvanceDeletionTab::OnGenerateComboContent)
+	.OnSelectionChanged(this,&SAdvanceDeletionTab::OnComboSelectionChanged)
+	[
+		SAssignNew(ComboDisplayTextBlock,STextBlock)
+		.Text(FText::FromString(TEXT("List Assets option")))
+	];
+
+	return ConstructedComboBox;
+}
+
+TSharedRef<SWidget> SAdvanceDeletionTab::OnGenerateComboContent(TSharedPtr<FString> SourceItem)
+{
+	TSharedRef<STextBlock>ConstructedComboText= SNew(STextBlock).Text(FText::FromString(*SourceItem.Get()));
+	return ConstructedComboText;
+}
+
+void SAdvanceDeletionTab::OnComboSelectionChanged(TSharedPtr<FString> SelectedOption, ESelectInfo::Type InSelectInfo)
+{
+	MessageAction::LogPrint(TEXT("1"));
+	ComboDisplayTextBlock->SetText(FText::FromString(*SelectedOption.Get()));
+}
+
+#pragma endregion 
+
 
 #pragma region RowWidgetForAssetListView	
 TSharedRef<ITableRow> SAdvanceDeletionTab::OnGenerateRowForList(TSharedPtr<FAssetData> AssetDataToDisplay,
