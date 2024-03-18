@@ -9,18 +9,21 @@
 
 #define ListAll TEXT("List All Available Assets")
 #define ListUnused TEXT("List Unused Assets")
+#define ListSameName TEXT("List Assets With Same Name")
 
 void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 {
 	bCanSupportFocus = true;
 
 	StoredAssetsData = InArgs._AssetDataToStore;
-	DisplayedAssetData=StoredAssetsData;
+	DisplayedAssetsData=StoredAssetsData;
 	CheckBoxesArray.Empty();
 	AssetsDataToDeletArray.Empty();
 
 	ComboBoxSourceItems.Add(MakeShared<FString>(ListAll));
 	ComboBoxSourceItems.Add(MakeShared<FString>(ListUnused));
+	ComboBoxSourceItems.Add(MakeShared<FString>(ListSameName));
+	
 	FSlateFontInfo TitleTextFont = FCoreStyle::Get().GetFontStyle(FName("EmbossedText"));
 	TitleTextFont.Size = 30;
 
@@ -93,7 +96,7 @@ TSharedRef<SListView<TSharedPtr<FAssetData>>> SAdvanceDeletionTab::ConstructAsse
 {
 	ConstructedAssetListView= SNew(SListView<TSharedPtr<FAssetData>>)
 				.ItemHeight(24.f)
-				.ListItemsSource(&DisplayedAssetData)
+				.ListItemsSource(&DisplayedAssetsData)
 				.OnGenerateRow(this, &SAdvanceDeletionTab::OnGenerateRowForList);
 	return ConstructedAssetListView.ToSharedRef();
 }
@@ -141,13 +144,19 @@ void SAdvanceDeletionTab::OnComboSelectionChanged(TSharedPtr<FString> SelectedOp
 	if (*SelectedOption.Get()==ListAll)
 	{
 		//List all stored asset data
-		DisplayedAssetData=StoredAssetsData;
+		DisplayedAssetsData=StoredAssetsData;
 		RefreshAssetListView();
 	}
 	else if(*SelectedOption.Get()==ListUnused)
 	{
 		//List all unused asssets
-		Master_AModule.ListUnusedAssetsForAssetList(StoredAssetsData,DisplayedAssetData);
+		Master_AModule.ListUnusedAssetsForAssetList(StoredAssetsData,DisplayedAssetsData);
+		RefreshAssetListView();
+	}
+	else if (*SelectedOption.Get()==ListSameName)
+	{
+		//List assets with same name
+		Master_AModule.ListSameNameAssetsForAssetList(StoredAssetsData,DisplayedAssetsData);
 		RefreshAssetListView();
 	}
 }
@@ -328,9 +337,9 @@ FReply SAdvanceDeletionTab::OnDeleteAllButtonClicked()
 			{
 				StoredAssetsData.Remove(DeletedData);
 			}
-			if (DisplayedAssetData.Contains(DeletedData))
+			if (DisplayedAssetsData.Contains(DeletedData))
 			{
-				DisplayedAssetData.Remove(DeletedData);
+				DisplayedAssetsData.Remove(DeletedData);
 			}
 		}
 		RefreshAssetListView();
