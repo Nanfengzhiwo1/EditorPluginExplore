@@ -214,6 +214,7 @@ void FMaster_AModule::OnDeleteEmptyFoldersButtonClicked()
 }
 void FMaster_AModule::OnAdvanceDeletionButtonClicked()
 {
+	FixUpRedirectors();
 	FGlobalTabmanager::Get()->TryInvokeTab(FName("Advance Deletion"));
 }
 void FMaster_AModule::FixUpRedirectors()
