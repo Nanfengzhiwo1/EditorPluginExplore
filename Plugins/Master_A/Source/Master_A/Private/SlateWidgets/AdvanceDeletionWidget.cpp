@@ -98,7 +98,8 @@ TSharedRef<SListView<TSharedPtr<FAssetData>>> SAdvanceDeletionTab::ConstructAsse
 	ConstructedAssetListView= SNew(SListView<TSharedPtr<FAssetData>>)
 				.ItemHeight(24.f)
 				.ListItemsSource(&DisplayedAssetsData)
-				.OnGenerateRow(this, &SAdvanceDeletionTab::OnGenerateRowForList);
+				.OnGenerateRow(this, &SAdvanceDeletionTab::OnGenerateRowForList)
+				.OnMouseButtonClick(this,&SAdvanceDeletionTab::OnRowWidgetMouseButtonClicked);
 	return ConstructedAssetListView.ToSharedRef();
 }
 
@@ -222,6 +223,12 @@ TSharedRef<ITableRow> SAdvanceDeletionTab::OnGenerateRowForList(TSharedPtr<FAsse
 			]
 		];
 	return ListViewRowWidget;
+}
+
+void SAdvanceDeletionTab::OnRowWidgetMouseButtonClicked(TSharedPtr<FAssetData> ClickedData)
+{
+	FMaster_AModule&Master_AModule= FModuleManager::LoadModuleChecked<FMaster_AModule>(TEXT("Master_A"));
+	Master_AModule.SyncContentBrowerToClickedAssetForAssetList(ClickedData->ObjectPath.ToString());
 }
 
 TSharedRef<SCheckBox> SAdvanceDeletionTab::ConstructCheckBox(const TSharedPtr<FAssetData>& AssetDataToDisplay)

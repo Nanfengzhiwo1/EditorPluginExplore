@@ -357,6 +357,13 @@ void FMaster_AModule::ListSameNameAssetsForAssetList(const TArray<TSharedPtr<FAs
 	}
 }
 
+void FMaster_AModule::SyncContentBrowerToClickedAssetForAssetList(const FString& AssetPathToSync)
+{
+	TArray<FString>AssetsPathToSync;
+	AssetsPathToSync.Add(AssetPathToSync);
+	UEditorAssetLibrary::SyncBrowserToObjects(AssetsPathToSync);
+}
+
 #pragma endregion
 
 #undef LOCTEXT_NAMESPACE
