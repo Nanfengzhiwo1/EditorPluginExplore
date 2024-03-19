@@ -19,12 +19,13 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 	DisplayedAssetsData=StoredAssetsData;
 	CheckBoxesArray.Empty();
 	AssetsDataToDeletArray.Empty();
-
+	ComboBoxSourceItems.Empty();
+	
 	ComboBoxSourceItems.Add(MakeShared<FString>(ListAll));
 	ComboBoxSourceItems.Add(MakeShared<FString>(ListUnused));
 	ComboBoxSourceItems.Add(MakeShared<FString>(ListSameName));
 	
-	FSlateFontInfo TitleTextFont = FCoreStyle::Get().GetFontStyle(FName("EmbossedText"));
+	FSlateFontInfo TitleTextFont = GetEmboseedTextFont();
 	TitleTextFont.Size = 30;
 
 	ChildSlot
@@ -282,6 +283,10 @@ FReply SAdvanceDeletionTab::OnDeleteButtonClicked(TSharedPtr<FAssetData> Clicked
 		if (StoredAssetsData.Contains(ClickedAssetData))
 		{
 			StoredAssetsData.Remove(ClickedAssetData);
+		}
+		if (DisplayedAssetsData.Contains(ClickedAssetData))
+		{
+			DisplayedAssetsData.Remove(ClickedAssetData);
 		}
 		//Refresh the list
 		RefreshAssetListView();
