@@ -23,6 +23,7 @@ void FMaster_AModule::ShutdownModule()
 {
 	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
 	// we call this function before unloading the module.
+	FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(FName("AdvanceDeletion"));
 }
 
 
@@ -266,7 +267,7 @@ TSharedRef<SDockTab> FMaster_AModule::OnSpawnAdvanceDeltionTab(const FSpawnTabAr
 {
 	return SNew(SDockTab).TabRole(ETabRole::NomadTab)
 		[
-			SNew(SAdvanceDeletionTab).AssetDataToStore(GetAllAssetDataUnderSelectedFolder())
+			SNew(SAdvanceDeletionTab).AssetDataToStore(GetAllAssetDataUnderSelectedFolder()).CurrentSelectedFolder(FolderPathsSelected[0])
 		];
 }
 
